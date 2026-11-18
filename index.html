@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7f1">
+  <meta name="description" content="My Green House — вместе делаем город чище.">
+  <title>My Green House</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="My Green House — главная">
+        <span class="brand-mark" aria-hidden="true">🌿</span>
+        <span class="brand-copy"><strong>my green house</strong><small>город начинается с нас</small></span>
+      </a>
+      <nav class="desktop-nav" aria-label="Основная навигация">
+        <button class="nav-link active" data-view="tasks">Задачи</button>
+        <button class="nav-link" data-view="report">Сообщить</button>
+        <button class="nav-link" data-view="shop">Магазин</button>
+        <button class="nav-link" data-view="profile">Рейтинг</button>
+      </nav>
+      <div class="header-actions">
+        <div class="wallet"><span>🪙</span><strong id="header-balance">—</strong><small>MGHC</small></div>
+        <button class="profile-chip" id="profile-shortcut" aria-label="Открыть профиль"><span id="header-avatar">🌱</span><b id="header-rating">—</b></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="view active" id="view-tasks">
+        <div class="page-heading">
+          <div><p class="eyebrow">MY GREEN HOUSE · ГОРОДСКАЯ ЭКОСИСТЕМА</p><h1>Чистый город — <span>наше общее дело.</span></h1>
+            <p class="muted">Находите проблемы, помогайте соседям и получайте MGHC за реальные дела.</p></div>
+          <button class="button button-primary" data-goto="report">＋ Сообщить о проблеме</button>
+        </div>
+        <div class="stats-grid" aria-label="Статистика города">
+          <article class="stat-card"><span class="stat-icon mint">📍</span><div><strong id="stat-total">0</strong><span>Всего заявок</span></div></article>
+          <article class="stat-card"><span class="stat-icon coral">🧹</span><div><strong id="stat-open">0</strong><span>Требуют уборки</span></div></article>
+          <article class="stat-card"><span class="stat-icon green">🌳</span><div><strong id="stat-done">0</strong><span>Очищено точек</span></div></article>
+          <article class="stat-card"><span class="stat-icon gold">🪙</span><div><strong id="stat-paid">0</strong><span>Выплачено MGHC</span></div></article>
+        </div>
+        <div class="workspace-grid">
+          <section class="panel map-panel">
+            <div class="panel-heading"><div><p class="eyebrow">ЭКОКАРТА</p><h2>Задачи рядом</h2></div><div class="legend"><span><i class="dot dot-open"></i>Нужна помощь</span><span><i class="dot dot-progress"></i>В работе</span><span><i class="dot dot-review"></i>Проверка</span><span><i class="dot dot-done"></i>Готово</span></div></div>
+            <div id="task-map" class="map" role="application" aria-label="Карта экологических задач"></div>
+          </section>
+          <section class="panel task-panel">
+            <div class="panel-heading task-heading"><div><p class="eyebrow">АКТИВНОСТЬ СООБЩЕСТВА</p><h2>Список задач</h2></div><span class="task-count" id="task-count">0</span></div>
+            <div class="filters">
+              <label class="search-box"><span>⌕</span><input id="task-search" type="search" placeholder="Поиск по задачам" aria-label="Поиск по задачам"></label>
+              <div class="filter-row">
+                <select id="category-filter" aria-label="Фильтр по категории"><option value="">Все категории</option><option value="trash">Мусор</option><option value="dump">Свалка</option><option value="water">Водоём</option><option value="trees">Зелёные зоны</option></select>
+                <select id="status-filter" aria-label="Фильтр по статусу"><option value="">Все статусы</option><option value="open">Нужна помощь</option><option value="in_progress">В работе</option><option value="review">Проверка</option><option value="completed">Выполнено</option></select>
+              </div>
+            </div>
+            <div id="task-list" class="task-list" aria-live="polite"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-report">
+        <div class="page-heading compact-heading"><div><p class="eyebrow">ВАША НАБЛЮДАТЕЛЬНОСТЬ ВАЖНА</p><h1>Сообщить о проблеме</h1><p class="muted">Отметьте точку, добавьте фото и коротко опишите, что случилось.</p></div></div>
+        <div class="form-layout">
+          <form id="report-form" class="panel report-form">
+            <label class="field-label">Название<input name="title" maxlength="90" required placeholder="Например, мусор у остановки"></label>
+            <label class="field-label">Описание<textarea name="description" maxlength="1000" rows="4" placeholder="Что именно нужно убрать? Есть ли важные детали?"></textarea></label>
+            <label class="field-label">Категория<select name="category" id="report-category" required><option value="trash">Мусор · 25 MGHC</option><option value="dump">Стихийная свалка · 50 MGHC</option><option value="water">Загрязнение водоёма · 40 MGHC</option><option value="trees">Зелёная зона · 30 MGHC</option></select></label>
+            <div class="reward-note">🪙 Рекомендуемая награда: <strong id="recommended-reward">25 MGHC</strong><small>Итоговую награду подтвердит модератор.</small></div>
+            <div class="field-label">Фото «ДО» <span class="required-note">обязательно</span>
+              <label class="upload-box" for="before-photo"><span class="upload-icon">📷</span><strong id="photo-label">Добавить фото места</strong><small>JPEG, PNG или WebP · сжатие до 800 px</small><input id="before-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label>
+            </div>
+            <div class="field-label">Место на карте <span class="required-note">обязательно</span></div>
+            <div id="report-map" class="map report-map" role="application" aria-label="Выберите место на карте"></div>
+            <p id="selected-location" class="location-caption">Нажмите на карту или определите местоположение.</p>
+            <button type="button" class="button button-secondary full-button" id="locate-button">📡 Определить мое местоположение (GPS)</button>
+            <button type="submit" class="button button-primary full-button" id="report-submit">Опубликовать задачу</button>
+          </form>
+          <aside class="panel info-panel"><span class="info-illustration">🌱</span><h2>Маленький шаг — большое изменение</h2><p>Каждая подтверждённая задача помогает сделать город чище. Волонтёры получат MGHC после проверки фотоотчёта модератором.</p><div class="info-tip"><strong>Как это работает?</strong><ol><li>Отметьте проблему и приложите фото «ДО».</li><li>Волонтёр возьмёт задачу и загрузит фото «ПОСЛЕ».</li><li>После проверки награда поступит на ваш баланс.</li></ol></div></aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-shop">
+        <div class="page-heading"><div><p class="eyebrow">НАГРАДЫ ЗА ДОБРЫЕ ДЕЛА</p><h1>Магазин <span>MGHC</span></h1><p class="muted">Обменивайте коины на предложения экологичных партнёров.</p></div><div class="balance-card">Ваш баланс <strong>🪙 <span id="shop-balance">0</span> MGHC</strong></div></div>
+        <div id="shop-list" class="shop-grid"></div>
+        <section class="panel vouchers-panel"><div class="panel-heading"><div><p class="eyebrow">ВАШИ ПОКУПКИ</p><h2>Мои ваучеры</h2></div></div><div id="voucher-list" class="voucher-list"></div></section>
+      </section>
+
+      <section class="view" id="view-profile">
+        <div class="page-heading compact-heading"><div><p class="eyebrow">ВАШ ВКЛАД В ГОРОД</p><h1>Рейтинг и профиль</h1><p class="muted">Каждое доброе дело меняет город и ваш личный результат.</p></div></div>
+        <div class="profile-layout">
+          <section class="panel profile-card"><div class="profile-hero"><span class="large-avatar" id="profile-avatar">🌱</span><div><p class="eyebrow">ЭКО-ВОЛОНТЁР</p><h2 id="profile-name">Гость</h2><span class="rank-pill" id="profile-rank">Новичок природы</span></div><button id="edit-name-button" class="text-button hidden" type="button" aria-label="Изменить имя профиля">Изменить</button></div><div class="profile-stats"><div><strong id="profile-completed">0</strong><span>Уборок</span></div><div><strong id="profile-rating">0</strong><span>Рейтинг</span></div><div><strong id="profile-balance">0</strong><span>MGHC</span></div></div><button id="sign-in-button" class="button button-secondary full-button">Войти через Telegram</button><button id="sign-out-button" class="text-button hidden">Выйти из аккаунта</button></section>
+          <section class="panel history-panel"><div class="panel-heading"><div><p class="eyebrow">ДВИЖЕНИЕ БАЛАНСА</p><h2>История MGHC</h2></div></div><div id="transaction-list" class="transaction-list"></div></section>
+        </div>
+        <section class="panel leaderboard-panel"><div class="panel-heading"><div><p class="eyebrow">ЛЮДИ, КОТОРЫЕ МЕНЯЮТ ГОРОД</p><h2>Лидеры сообщества</h2></div><span class="leaderboard-caption">по числу уборок</span></div><div class="table-wrap"><table><thead><tr><th>Место</th><th>Участник</th><th>Уборки</th><th>Рейтинг</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div></section>
+      </section>
+    </main>
+    <nav class="mobile-nav" aria-label="Навигация">
+      <button class="mobile-link active" data-view="tasks"><span>⌖</span>Задачи</button><button class="mobile-link" data-view="report"><span>＋</span>Сообщить</button><button class="mobile-link" data-view="shop"><span>♧</span>Магазин</button><button class="mobile-link" data-view="profile"><span>♙</span>Профиль</button>
+    </nav>
+  </div>
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>

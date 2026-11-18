@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh";
 export const config = {
   supabaseUrl: "https://supabase.co",
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthZ2loZ2JycnlkZ3R1eGNobGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwMTM5MzQsImV4cCI6MjExMDU4OTkzNH0.OQJARsv1yuaD4JvHsjPKdZ_eQTZXL9rGFiEjfKlp1zA",
-  botApiUrl: "https://YOUR_BOT_API_HOST"
+  botApiUrl: "https://mgh-bot.onrender.com"
 };
 
 const isConfigured = !config.supabaseUrl.includes("YOUR_PROJECT_ID")
